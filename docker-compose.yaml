@@ -1,0 +1,7 @@
+version: "3.6"
+services:
+  tg_bot:
+    container_name: tg_bot
+    build:
+      context: tg_bot/
+    env_file: tg_bot/.env
