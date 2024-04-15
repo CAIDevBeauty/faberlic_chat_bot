@@ -8,7 +8,6 @@ from dialog_graph import script
 def get_pipeline() -> Pipeline:
     telegram_token = os.getenv("TG_BOT_TOKEN")
 
-
     if telegram_token:
         messenger_interface = PollingTelegramInterface(token=telegram_token)
 
