@@ -1,47 +1,35 @@
-import dff.script.conditions as cnd
-from dff.script import RESPONSE, TRANSITIONS, Message, LOCAL, PRE_TRANSITIONS_PROCESSING
 
-
-from dialog_graph import conditions as loc_cnd
-from dialog_graph import response as loc_rsp
-from dialog_graph import processing as loc_prc
-from dialog_graph.fallbacks import fallback_response
+from dff.script import conditions as cnd, PRE_TRANSITIONS_PROCESSING
+from dff.script import RESPONSE, TRANSITIONS, Message
+from dff.messengers.telegram import TelegramMessage
+from . import conditions as loc_cnd
+from dff.script import labels as lbl
+from . import processing as loc_prc
 
 script = {
     "general_flow": {
-        "general_flow": {
-            LOCAL: {
-                TRANSITIONS: {
-                    ("form_flow", "ask_item", 1.0): cnd.any(
-                        [loc_cnd.has_intent(["shopping_list", "transfer"]), cnd.regexp(r"\border\b|\bpurchase\b")]
-                    ),
-                    ("chitchat_flow", "init_chitchat", 0.8): cnd.true(),
-                },
-                PRE_TRANSITIONS_PROCESSING: {"1": loc_prc.extract_intents()},
-            },
         "start_node": {
-            RESPONSE: Message(),  # the response of the initial node is skipped
-            TRANSITIONS: {
-                ("general_flow", "greeting_node"): cnd.exact_match(Message("/start")),
-            },
+            TRANSITIONS: {("chat_flow", "greeting_node"): cnd.exact_match(TelegramMessage(text="/start"))},
         },
         "fallback_node": {
-            RESPONSE: fallback_response,
-            TRANSITIONS: {
-                ("general_flow", "greeting_node"): cnd.true(),
-            },
+            RESPONSE: Message("Не получается распознать запрос"),
         },
     },
     "chat_flow": {
-        LOCAL: {
+        "greeting_node": {
+            RESPONSE: TelegramMessage(text="Вас приветствует бот-консультант Фаберлик! Я отвечу на любой ваш вопрос или помогу сделать заказ"),
             PRE_TRANSITIONS_PROCESSING: {"1": loc_prc.clear_intents(), "2": loc_prc.extract_intents()},
-        "init_chat": {
-            RESPONSE: Message(text="Вас приветствует бот-консультант Фаберлик!"),
-            TRANSITIONS: {("chat_flow", "chat", 0.8): cnd.true()},
+            TRANSITIONS: {("chat_flow", "chat", 0.1): loc_cnd.has_intent(["purchase"])},
         },
-        "chat": {
-
+        "chat":{
+            PRE_TRANSITIONS_PROCESSING: {"1": loc_prc.extract_intents()},
+            TRANSITIONS: {
+                ("chat_flow", "buy_node", 0.2): loc_cnd.has_intent(['purchase']),
+                lbl.repeat(0.1): cnd.true()
+            }
+        },
+        "buy_node":{
+            RESPONSE: Message("Покупка совершена!")
         }
-
     }
 }

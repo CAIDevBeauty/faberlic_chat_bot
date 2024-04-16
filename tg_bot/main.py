@@ -1,5 +1,6 @@
 import os
 
+from dff.context_storages import context_storage_factory
 from dff.messengers.telegram import PollingTelegramInterface
 from dff.pipeline import Pipeline
 from dialog_graph import script
@@ -7,6 +8,14 @@ from dialog_graph import script
 
 def get_pipeline() -> Pipeline:
     telegram_token = os.getenv("TG_BOT_TOKEN")
+
+    db_uri = "postgresql+asyncpg://{}:{}@localhost:5432/{}".format(
+        os.environ["POSTGRES_USERNAME"],
+        os.environ["POSTGRES_PASSWORD"],
+        os.environ["POSTGRES_DB"],
+    )
+    db = context_storage_factory(db_uri)
+
 
     if telegram_token:
         messenger_interface = PollingTelegramInterface(token=telegram_token)
@@ -22,6 +31,7 @@ def get_pipeline() -> Pipeline:
         start_label=("general_flow", "start_node"),
         fallback_label=("general_flow", "fallback_node"),
         messenger_interface=messenger_interface,
+        verbose=True
     )
 
     return pipeline

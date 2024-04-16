@@ -5,3 +5,19 @@ services:
     build:
       context: tg_bot/
     env_file: tg_bot/.env
+
+  postgres:
+    container_name: postgres_context
+    image: postgres
+    env_file:
+      - .env
+    environment:
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres:/data/postgres
+    ports:
+      - "${POSTGRES_EXTERNAL_PORT}:5432"
+
+volumes:
+  postgres:
+
