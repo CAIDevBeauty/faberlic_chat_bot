@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 
-from .api.schemas.intents import IntentRequestBody, IntentResponseBody
+from api.schemas.intents import IntentRequestBody, IntentResponseBody
 
 router = APIRouter()
 

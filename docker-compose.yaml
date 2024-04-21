@@ -1,0 +1,16 @@
+version: "3.6"
+services:
+  preprocessors:
+    restart: unless-stopped
+    build:
+      context: models_api/
+    volumes:
+      - ./models_api:/app/
+    env_file:
+      - ./models_api/.env
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "10"
+    network_mode: "host"
