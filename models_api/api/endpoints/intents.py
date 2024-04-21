@@ -9,5 +9,6 @@ router = APIRouter()
 async def get_intents(requests: Request, body: IntentRequestBody) -> IntentResponseBody:
     intent_classifier = requests.app.state.intent_classifier
 
-    result = intent_classifier.get_intents(body.text)
-    return IntentResponseBody(**result)
+    result = await intent_classifier.get_answer(body.text)
+    print(result)
+    return IntentResponseBody(intent_class=result)

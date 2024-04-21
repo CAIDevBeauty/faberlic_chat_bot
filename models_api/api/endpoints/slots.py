@@ -9,5 +9,5 @@ router = APIRouter()
 async def get_intents(requests: Request, body: SlotsFillingRequestBody) -> SlotsFillingResponseBody:
     slots_filler = requests.app.state.slots_filler
 
-    result = await slots_filler.get_slots(body.dialog_context)
+    result = await slots_filler.get_answer(body.dialog_context)
     return result

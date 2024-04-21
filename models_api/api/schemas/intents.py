@@ -6,6 +6,4 @@ class IntentRequestBody(BaseModel):
 
 
 class IntentResponseBody(BaseModel):
-    sequence: str
-    labels: list[str]
-    scores: list[float]
+    intent_class: str
