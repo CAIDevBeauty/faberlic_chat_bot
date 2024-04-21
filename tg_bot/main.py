@@ -9,7 +9,7 @@ from dialog_graph import script
 def get_pipeline() -> Pipeline:
     telegram_token = os.getenv("TG_BOT_TOKEN")
 
-    db_uri = "postgresql+asyncpg://{}:{}@localhost:5432/{}".format(
+    db_uri = "postgresql+asyncpg://{}:{}@0.0.0.0:5432/{}".format(
         os.environ["POSTGRES_USERNAME"],
         os.environ["POSTGRES_PASSWORD"],
         os.environ["POSTGRES_DB"],
