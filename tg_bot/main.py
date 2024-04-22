@@ -31,7 +31,7 @@ def get_pipeline() -> Pipeline:
         start_label=("general_flow", "start_node"),
         fallback_label=("general_flow", "fallback_node"),
         messenger_interface=messenger_interface,
-        verbose=True
+        context_storage=db
     )
 
     return pipeline

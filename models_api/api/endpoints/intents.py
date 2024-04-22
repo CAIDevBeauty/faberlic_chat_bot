@@ -10,5 +10,4 @@ async def get_intents(requests: Request, body: IntentRequestBody) -> IntentRespo
     intent_classifier = requests.app.state.intent_classifier
 
     result = await intent_classifier.get_answer(body.text)
-    print(result)
     return IntentResponseBody(intent_class=result)

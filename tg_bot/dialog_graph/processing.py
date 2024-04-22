@@ -2,7 +2,7 @@ import re
 from string import punctuation
 from dff.script import Context
 from dff.pipeline import Pipeline
-from api import intents, slots
+from api import intents, slots, search
 from . import consts
 
 
@@ -17,13 +17,14 @@ def extract_intents():
 
     return extract_intents_inner
 
-# def extract_slots():
-#     def extract_slots_inner(ctx: Context, _: Pipeline) -> Context:
-#         recognized_slots =  slots.get_slots(ctx.last_request)
-#         for slot in recognized_slots.items():
-#             ctx.misc[consts.SLOTS][slot['name']] = slot['value']
-#         return ctx
-#     return extract_slots_inner
+def extract_slots():
+    def extract_slots_inner(ctx: Context, _: Pipeline) -> Context:
+        recognized_slots = slots.get_slots(ctx.last_request)
+        for slot_key, slot_value in recognized_slots.items():
+            if ctx.misc[consts.SLOTS].get(slot_key) is None:
+                ctx.misc[consts.SLOTS][slot_key] = slot_value
+        return ctx
+    return extract_slots_inner
 
 
 def clear_intents():
@@ -42,10 +43,10 @@ def clear_slots():
     """
     Clear slots container.
     """
-
     def clear_slots_inner(ctx: Context, _: Pipeline) -> Context:
         ctx.misc[consts.SLOTS] = {}
         return ctx
 
     return clear_slots_inner
+
 
