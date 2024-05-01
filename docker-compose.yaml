@@ -4,7 +4,11 @@ services:
     container_name: tg_bot
     build:
       context: tg_bot/
-    env_file: tg_bot/.env
+    env_file:
+      - tg_bot/.env
+      - .env
+    depends_on:
+      - postgres
 
   postgres:
     container_name: postgres_context
@@ -18,6 +22,80 @@ services:
     ports:
       - "${POSTGRES_EXTERNAL_PORT}:5432"
 
-volumes:
-  postgres:
+  dashboard:
+    env_file:
+      - .env
+    build:
+      context: ./stats/docker
+      dockerfile: dockerfile_stats
+    image: ghcr.io/deeppavlov/superset_df_dashboard:latest
+    depends_on:
+      dashboard-metadata:
+        condition: service_healthy
+      clickhouse:
+        condition: service_started
+    profiles:
+      - stats
+    ports:
+      - "8088:8088"
+
+  dashboard-metadata:
+      env_file:
+        - .env
+      image: postgres:latest
+      profiles:
+        - stats
+      restart: unless-stopped
+      expose:
+        - "5433"
+      ports:
+        - 5433:5433
+      command: -p 5433
+      healthcheck:
+        test: pg_isready -p 5433 --username=$${POSTGRES_USERNAME}
+        interval: 5s
+        timeout: 10s
+        retries: 5
+        start_period: 30s
+      volumes:
+        - ./dashboard-data:/var/lib/postgresql/data
+
+  clickhouse:
+      env_file:
+        - .env
+      image: clickhouse/clickhouse-server:latest
+      profiles:
+        - stats
+      restart: unless-stopped
+      ports:
+        - '8123:8123'
+        - '8443:8443'
+        - '9000:9000'
+      volumes:
+        - ./ch-data:/var/lib/clickhouse/
+      healthcheck:
+        test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping
+        interval: 5s
+        timeout: 10s
+        retries: 5
+        start_period: 30s
+
+  otelcol:
+      image: otel/opentelemetry-collector-contrib:latest
+      profiles:
+        - stats
+      container_name: otel-col
+      restart: unless-stopped
+      command: [ "--config=/etc/otelcol-config.yml", "--config=/etc/otelcol-config-extras.yml" ]
+      depends_on:
+        clickhouse:
+          condition: service_healthy
+      volumes:
+        - ./stats/otel/otelcol-config.yml:/etc/otelcol-config.yml:ro
+        - ./stats/otel/otelcol-config-extras.yml:/etc/otelcol-config-extras.yml:ro
+      ports:
+        - "4317:4317"    # OTLP over gRPC receiver
+        - "4318:4318"    # OTLP over HTTP receiver
+
+
 

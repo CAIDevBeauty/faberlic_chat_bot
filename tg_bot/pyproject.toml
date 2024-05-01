@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-dff = {extras = ["postgresql", "telegram"], version = "^0.7.0"}
+dff = {extras = ["stats", 'telegram', 'postgresql'], version = "^0.7.0"}
 
 
 [tool.poetry.group.dev.dependencies]
