@@ -19,8 +19,7 @@ script = {
                     ['hair_type', 'product_type', 'price', 'series'])]),
                 ("chat_flow", 'details_node'): cnd.all([loc_cnd.has_intent(["purchase of goods"]), cnd.negation(
                     loc_cnd.is_slots_full(['hair_type', 'product_type', 'price', 'series']))]),
-                ("chat_flow", "faq_node"): cnd.negation(loc_cnd.has_intent(['purchase_of_goods'])),
-                "fallback_node": cnd.true(),
+                ("chat_flow", "faq_node"): cnd.negation(loc_cnd.has_intent(['purchase_of_goods']))
         }},
         "fallback_node": {
             RESPONSE: Message("Не получается распознать запрос"),
@@ -31,7 +30,7 @@ script = {
     },
     "chat_flow": {
         "intro_node": {
-            RESPONSE: get_welcome_text,
+
             PRE_TRANSITIONS_PROCESSING: {"1": loc_prc.clear_intents(), "2": loc_prc.clear_slots(),  "3": loc_prc.extract_intents(), "4": loc_prc.extract_slots()},
             TRANSITIONS: {
                 ("chat_flow", "search_node"): cnd.all([loc_cnd.has_intent(["purchase of goods"]),loc_cnd.is_slots_full(['hair_type', 'product_type', 'price', 'series'])]),
@@ -63,5 +62,7 @@ script = {
             RESPONSE: Message("Ответ на все сущее - 42")
         }
     }
+
 }
+
 
