@@ -11,7 +11,7 @@ product_tags = {
     "series": "серия"
 }
 def get_welcome_text(ctx: Context, _: Pipeline) -> Message:
-    return Message("Вас приветствует бот-консультант Фаберлик! Я отвечу на любой ваш вопрос или помогу сделать заказ")
+    return Message("Я бот-консультант Фаберлик! Я отвечу на любой ваш вопрос по заказам или помогу сделать заказ")
 
 def get_cannot_extract_all_slots_text(ctx: Context, _: Pipeline) -> Message:
     data = ctx.misc[consts.SLOTS]

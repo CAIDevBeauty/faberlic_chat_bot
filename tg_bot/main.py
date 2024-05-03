@@ -2,9 +2,9 @@ import os
 from datetime import datetime
 
 from dff import Context
-from dff.context_storages import context_storage_factory
+from dff.context_storages import context_storage_factory, DBContextStorage
 from dff.messengers.telegram import PollingTelegramInterface
-from dff.pipeline import Pipeline, ExtraHandlerRuntimeInfo, GlobalExtraHandlerType, ACTOR, Service
+from dff.pipeline import Pipeline, ExtraHandlerRuntimeInfo, ACTOR, Service
 from dialog_graph import script
 from dff.stats import (
     OtelInstrumentor,
@@ -20,7 +20,6 @@ dff_instrumentor = OtelInstrumentor()
 dff_instrumentor.instrument()
 
 
-# example extractor function
 @dff_instrumentor
 async def get_service_state(ctx: Context, _, info: ExtraHandlerRuntimeInfo):
     # extract execution state of service from info
@@ -29,28 +28,24 @@ async def get_service_state(ctx: Context, _, info: ExtraHandlerRuntimeInfo):
     }
     # return a record to save into connected database
     return data
-@dff_instrumentor
-async def collect_timestamp_before(ctx: Context, _, info: ExtraHandlerRuntimeInfo):
-    ctx.misc.update({f"{info.component.name}": datetime.now()})
 
-@dff_instrumentor
-async def collect_timestamp_after(ctx: Context, _, info: ExtraHandlerRuntimeInfo):
-    ctx.misc.update(
-        {
-            f"{info.component.name}": datetime.now()
-            - ctx.misc[f"{info.component.name}"]
-        }
-    )
+
+def _get_db_storage_factory() -> DBContextStorage | None:
+    postgres_user = os.getenv('POSTGRES_CONTEXT_USER')
+    postgres_password = os.getenv('POSTGRES_CONTEXT_PASSWORD')
+    postgres_host = os.getenv('POSTGRES_CONTEXT_HOST')
+    postgres_port = os.getenv('POSTGRES_CONTEXT_PORT')
+    postgres_db = os.getenv("POSTGRES_CONTEXT_DB")
+    if not all([postgres_user, postgres_password, postgres_host, postgres_port, postgres_db]):
+        return None
+    db_uri = f"postgresql+asyncpg://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}"
+    db = context_storage_factory(db_uri)
+    return db
 
 def get_pipeline() -> Pipeline:
     telegram_token = os.getenv("TG_BOT_TOKEN")
 
-    db_uri = "postgresql+asyncpg://{}:{}@0.0.0.0:5432/{}".format(
-        os.environ["POSTGRES_USERNAME"],
-        os.environ["POSTGRES_PASSWORD"],
-        os.environ["POSTGRES_DB"],
-    )
-    db = context_storage_factory(db_uri)
+
 
 
     if telegram_token:
@@ -67,6 +62,7 @@ def get_pipeline() -> Pipeline:
         "start_label": ("general_flow", "start_node"),
         "fallback_label":("general_flow", "fallback_node"),
         "messenger_interface":messenger_interface,
+        "context_storage": _get_db_storage_factory(),
         "components":[
         Service(
             handler=ACTOR,
@@ -78,12 +74,10 @@ def get_pipeline() -> Pipeline:
                 default_extractors.get_current_label,
                 default_extractors.get_last_request,
                 default_extractors.get_last_response,
+                get_service_state
             ],
         )]},
     )
-
-
-
     return pipeline
 
 
