@@ -8,7 +8,7 @@ services:
       - tg_bot/.env
       - .env
     depends_on:
-      postgres:
+      context:
           condition: service_healthy
       backend:
         condition: service_started
@@ -20,29 +20,33 @@ services:
       dockerfile: Dockerfile
     expose:
       - "8000"
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8000/ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
     env_file:
       - models_api/.env
       - .env
     ports:
        - "8000:8000"
 
-  postgres:
-    container_name: postgres_context
-    image: postgres
+  context:
+    image: postgres:latest
     env_file:
       - .env
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready", "-U", "postgres" ]
+      test: pg_isready  --username=$${POSTGRES_CONTEXT_USERNAME}
       interval: 10s
       timeout: 5s
       retries: 5
     environment:
       PGDATA: /data/postgres
-      POSTGRES_USERNAME: "${POSTGRES_CONTEXT_USER}"
-      POSTGRES_PASSWORD: "${POSTGRES_CONTEXT_PASSWORD}"
-      POSTGRES_HOST: "${POSTGRES_CONTEXT_HOST}"
-      POSTGRES_PORT: "${POSTGRES_CONTEXT_PORT}"
-      POSTGRES_DB: "${POSTGRES_CONTEXT_DB}"
+      POSTGRES_USERNAME: ${POSTGRES_CONTEXT_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_CONTEXT_PASSWORD}
+      POSTGRES_HOST: ${POSTGRES_CONTEXT_HOST}
+      POSTGRES_PORT: ${POSTGRES_CONTEXT_PORT}
+      POSTGRES_DB: ${POSTGRES_CONTEXT_DB}
     volumes:
       - ./postgres:/data/postgres
     ports:

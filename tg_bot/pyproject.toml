@@ -6,9 +6,8 @@ authors = ["starminalush <alica154323@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 dff = {extras = ["stats", 'telegram', 'postgresql'], version = "^0.7.0"}
-pydantic = "2.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
