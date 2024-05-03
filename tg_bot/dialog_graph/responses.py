@@ -6,8 +6,9 @@ from . import consts
 product_tags = {
     "hair_type": "тип волос",
     "product_type": "тип продукта",
-    "price": "цена",
-    "series": "серия",
+    "sex": "пол",
+    "is_cheap": "искать подешевле?",
+    "action": "действие",
 }
 
 

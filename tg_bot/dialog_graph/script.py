@@ -28,17 +28,17 @@ script = {
             TRANSITIONS: {
                 ("chat_flow", "search_node"): cnd.all(
                     [
-                        loc_cnd.has_intent(["purchase of goods"]),
-                        loc_cnd.is_slots_full(["hair_type", "product_type", "price", "series"]),
+                        loc_cnd.has_intent(["покупка товара"]),
+                        loc_cnd.is_slots_full(),
                     ]
                 ),
                 ("chat_flow", "details_node"): cnd.all(
                     [
-                        loc_cnd.has_intent(["purchase of goods"]),
-                        cnd.negation(loc_cnd.is_slots_full(["hair_type", "product_type", "price", "series"])),
+                        loc_cnd.has_intent(["покупка товара"]),
+                        cnd.negation(loc_cnd.is_slots_full()),
                     ]
                 ),
-                ("chat_flow", "faq_node"): cnd.negation(loc_cnd.has_intent(["purchase_of_goods"])),
+                ("chat_flow", "faq_node"): cnd.negation(loc_cnd.has_intent(["покупка товара"])),
                 ("general_flow", "fallback_node"): cnd.true(),
             },
         },
@@ -46,7 +46,7 @@ script = {
             RESPONSE: get_cannot_extract_all_slots_text,
             PRE_TRANSITIONS_PROCESSING: {"1": loc_prc.extract_slots()},
             TRANSITIONS: {
-                ("chat_flow", "search_node"): loc_cnd.is_slots_full(["hair_type", "product_type", "price", "series"]),
+                ("chat_flow", "search_node"): loc_cnd.is_slots_full(),
                 ("chat_flow", "details_node"): cnd.true(),
             },
         },

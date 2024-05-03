@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class SlotsFillingRequestBody(BaseModel):
@@ -6,7 +6,8 @@ class SlotsFillingRequestBody(BaseModel):
 
 
 class SlotsFillingResponseBody(BaseModel):
-    hair_type: str | None = None
+    sex: str | None = None
     product_type: str | None = None
-    price: int | None = None
-    series: str | None = None
+    action: str | None = None
+    hair_type: str | None = None
+    is_cheap: bool | None = None

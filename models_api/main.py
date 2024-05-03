@@ -9,12 +9,7 @@ from models.slots_filler import SlotsFiiler
 def create_app():
     new_app = FastAPI()
     new_app.include_router(router)
-    new_app.state.intent_classifier = IntentClassifier(
-        candidate_labels=[
-            "purchase of goods" "registration on the site",
-            "payment for goods" "receipt of goods" "product cancellation" "purchase returns",
-        ]
-    )
+    new_app.state.intent_classifier = IntentClassifier()
     new_app.state.slots_filler = SlotsFiiler()
     return new_app
 
