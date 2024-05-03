@@ -14,6 +14,7 @@ from dff.stats import (
 )
 
 from dialog_graph import script
+from pipeline_services.pre_services import get_nlu_info
 
 set_logger_destination(OTLPLogExporter("grpc://otelcol:4317", insecure=True))
 set_tracer_destination(OTLPSpanExporter("grpc://otelcol:4317", insecure=True))
@@ -64,6 +65,7 @@ def get_pipeline() -> Pipeline:
             "messenger_interface": messenger_interface,
             "context_storage": _get_db_storage_factory(),
             "components": [
+                get_nlu_info,
                 Service(
                     handler=ACTOR,
                     before_handler=[
@@ -74,7 +76,7 @@ def get_pipeline() -> Pipeline:
                         default_extractors.get_current_label,
                         default_extractors.get_last_request,
                         default_extractors.get_last_response,
-                        get_service_state,
+                        get_service_state
                     ],
                 )
             ],

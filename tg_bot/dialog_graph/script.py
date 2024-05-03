@@ -1,4 +1,3 @@
-import re
 
 from dff.messengers.telegram import TelegramMessage
 from dff.script import PRE_TRANSITIONS_PROCESSING, RESPONSE, TRANSITIONS, Message
@@ -6,61 +5,42 @@ from dff.script import conditions as cnd
 
 from . import conditions as loc_cnd
 from . import processing as loc_prc
-from .responses import get_cannot_extract_all_slots_text, get_welcome_text
+from .responses import get_welcome_text
 
 script = {
     "general_flow": {
-        "start_node": {TRANSITIONS: {("chat_flow", "intro_node"): cnd.exact_match(TelegramMessage("/start"))}},
+        "start_node": {
+            TRANSITIONS: {
+                ("general_flow", "welcome_node"): cnd.exact_match(TelegramMessage("/start")),
+            }
+        },
+        "welcome_node": {
+            RESPONSE: get_welcome_text,
+            TRANSITIONS: {
+                ("product_flow", "search_node"): loc_cnd.has_intent(["покупка товара"]),
+                ("faq_flow", "question_node"): cnd.negation(loc_cnd.has_intent(["покупка товара"])),
+            },
+        },
         "fallback_node": {
             RESPONSE: Message("Не получается распознать запрос"),
-            TRANSITIONS: {("general_flow", "start_node"): cnd.true()},
         },
     },
-    "chat_flow": {
-        "intro_node": {
-            RESPONSE: get_welcome_text,
-            PRE_TRANSITIONS_PROCESSING: {
-                "1": loc_prc.clear_intents(),
-                "2": loc_prc.clear_slots(),
-                "3": loc_prc.extract_intents(),
-                "4": loc_prc.extract_slots(),
-            },
-            TRANSITIONS: {
-                ("chat_flow", "search_node"): cnd.all(
-                    [
-                        loc_cnd.has_intent(["покупка товара"]),
-                        loc_cnd.is_slots_full(),
-                    ]
-                ),
-                ("chat_flow", "details_node"): cnd.all(
-                    [
-                        loc_cnd.has_intent(["покупка товара"]),
-                        cnd.negation(loc_cnd.is_slots_full()),
-                    ]
-                ),
-                ("chat_flow", "faq_node"): cnd.negation(loc_cnd.has_intent(["покупка товара"])),
-                ("general_flow", "fallback_node"): cnd.true(),
-            },
-        },
-        "details_node": {
-            RESPONSE: get_cannot_extract_all_slots_text,
-            PRE_TRANSITIONS_PROCESSING: {"1": loc_prc.extract_slots()},
-            TRANSITIONS: {
-                ("chat_flow", "search_node"): loc_cnd.is_slots_full(),
-                ("chat_flow", "details_node"): cnd.true(),
-            },
-        },
+    "product_flow": {
         "search_node": {
-            RESPONSE: Message("Мы тут что-то нашли, брать будете или еще поищете?"),
+            RESPONSE: Message("Я что-то нашел"),
             TRANSITIONS: {
-                ("chat_flow", "buy_node"): cnd.regexp(r"да", re.IGNORECASE),
-                ("chat_flow", "intro_node"): cnd.regexp(r"нет", re.IGNORECASE),
+                ("product_flow", "search_node"): loc_cnd.has_intent(["покупка товара"]),
+                ("faq_flow", "question_node"): cnd.negation(loc_cnd.has_intent(["покупка товара"])),
             },
-        },
-        "buy_node": {
-            RESPONSE: Message("Покупка совершена!"),
-            TRANSITIONS: {("chat_flow", "intro_node"): cnd.true()},
-        },
-        "faq_node": {RESPONSE: Message("Ответ на все сущее - 42")},
+        }
+    },
+    "faq_flow": {
+        "question_node": {
+            RESPONSE: Message("я отвечаю на faq"),
+            TRANSITIONS: {
+                ("product_flow", "search_node"): loc_cnd.has_intent(["покупка товара"]),
+                ("faq_flow", "question_node"): cnd.negation(loc_cnd.has_intent(["покупка товара"])),
+            },
+        }
     },
 }

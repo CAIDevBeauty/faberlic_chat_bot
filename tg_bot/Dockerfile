@@ -8,4 +8,5 @@ RUN poetry config installer.max-workers 4 && \
 
 COPY . /app
 WORKDIR app
+RUN pip install loguru
 CMD ["python3", "main.py" ]
