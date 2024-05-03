@@ -29,7 +29,7 @@ services:
       - models_api/.env
       - .env
     ports:
-       - "8000:8000"
+       - "${BACKEND_EXTERNAL_PORT}:8000"
 
   context:
     image: postgres:latest
@@ -65,7 +65,7 @@ services:
       clickhouse:
         condition: service_started
     ports:
-      - "${DASHBOARD_PORT}:8088"
+      - "${DASHBOARD_EXTERNAL_PORT}:8088"
 
   dashboard-metadata:
     env_file:
@@ -75,7 +75,7 @@ services:
     expose:
       - "5433"
     ports:
-      - "${DASHBOARD_METADATA_PORT}:5433"
+      - "${DASHBOARD_METADATA_EXTERNAL_PORT}:5433"
     command: -p 5433
     healthcheck:
       test: pg_isready -p 5433 --username=$${POSTGRES_USERNAME}
@@ -92,9 +92,9 @@ services:
       image: clickhouse/clickhouse-server:latest
       restart: unless-stopped
       ports:
-        - '8123:8123'
-        - '8443:8443'
-        - '9000:9000'
+        - '${CLICKHOUSE_HTTP_EXTERNAL_PORT}:8123'
+        - '${CLICKHOUSE_HTTPS_EXTERNAL_PORT}:8443'
+        - '${CLICKHOUSE_NATIVE_EXTERNAL_PORT}:9000'
       volumes:
         - ./ch-data:/var/lib/clickhouse/
       healthcheck:
@@ -116,8 +116,8 @@ services:
         - ./stats/otel/otelcol-config.yml:/etc/otelcol-config.yml:ro
         - ./stats/otel/otelcol-config-extras.yml:/etc/otelcol-config-extras.yml:ro
       ports:
-        - "4317:4317"    # OTLP over gRPC receiver
-        - "4318:4318"    # OTLP over HTTP receiver
+        - "${OTELCOL_GRPC_EXTERNAL_PORT}:4317"
+        - "${OTELCOL_HTTP_EXTERNAL_PORT}:4318"
 
 
 
