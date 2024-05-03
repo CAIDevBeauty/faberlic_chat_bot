@@ -1,8 +1,7 @@
 import requests
 from dff.script import Message
 
-
-SLOTS_FILLING_SERVICE = "http://localhost:8000/slots/"
+SLOTS_FILLING_SERVICE = "http://backend:8000/slots/"
 
 
 def get_slots(request: Message) -> dict | None:

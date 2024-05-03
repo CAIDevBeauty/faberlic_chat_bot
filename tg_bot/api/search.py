@@ -1,6 +1,7 @@
+import random
+
 import requests
 from dff.script import Message
-import random
 
 SEARCH_SERVICE_URI = "http://localhost:8000/search/"
 

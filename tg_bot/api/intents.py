@@ -1,8 +1,7 @@
 import requests
 from dff.script import Message
 
-
-INTENT_RECOGNITION_SERVICE = "http://localhost:8000/intents/"
+INTENT_RECOGNITION_SERVICE = "http://backend:8000/intents/"
 
 
 def get_intents(request: Message) -> str | None:
@@ -14,5 +13,5 @@ def get_intents(request: Message) -> str | None:
     except requests.RequestException:
         response = None
     if response and response.status_code == 200:
-        return response.json()['intent_class']
+        return response.json()["intent_class"]
     return None

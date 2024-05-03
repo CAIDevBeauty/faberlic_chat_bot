@@ -9,19 +9,20 @@ repos:
       - id: check-yaml
       - id: detect-private-key
 
+  - repo: https://github.com/psf/black
+    rev: 23.1.0
+    hooks:
+      - id: black
 
   - repo: https://github.com/PyCQA/isort
     rev: 5.12.0
     hooks:
       - id: isort
 
-  - repo: https://github.com/psf/black
-    rev: 23.1.0
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.1
     hooks:
-      - id: black
+      - id: autoflake
 
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.0.0
-    hooks:
-      - id: flake8
-        additional_dependencies: [Flake8-pyproject]
+
+exclude: ch-data, dashboard-data, postgres, stats,

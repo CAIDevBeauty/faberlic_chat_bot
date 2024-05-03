@@ -1,20 +1,41 @@
 version: "3.6"
 services:
-#  tg_bot:
-#    container_name: tg_bot
-#    build:
-#      context: tg_bot/
-#    env_file:
-#      - tg_bot/.env
-#      - .env
-#    depends_on:
-#      - postgres
+  tg_bot:
+    container_name: tg_bot
+    build:
+      context: tg_bot/
+    env_file:
+      - tg_bot/.env
+      - .env
+    depends_on:
+      postgres:
+          condition: service_healthy
+      backend:
+        condition: service_started
+
+  backend:
+    container_name: backend
+    build:
+      context: models_api
+      dockerfile: Dockerfile
+    expose:
+      - "8000"
+    env_file:
+      - models_api/.env
+      - .env
+    ports:
+       - "8000:8000"
 
   postgres:
     container_name: postgres_context
     image: postgres
     env_file:
       - .env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     environment:
       PGDATA: /data/postgres
       POSTGRES_USERNAME: "${POSTGRES_CONTEXT_USER}"
@@ -39,22 +60,18 @@ services:
         condition: service_healthy
       clickhouse:
         condition: service_started
-    profiles:
-      - stats
     ports:
-      - "8088:8088"
+      - "${DASHBOARD_PORT}:8088"
 
   dashboard-metadata:
     env_file:
       - .env
     image: postgres:latest
-    profiles:
-      - stats
     restart: unless-stopped
     expose:
       - "5433"
     ports:
-      - 5433:5433
+      - "${DASHBOARD_METADATA_PORT}:5433"
     command: -p 5433
     healthcheck:
       test: pg_isready -p 5433 --username=$${POSTGRES_USERNAME}
@@ -69,8 +86,6 @@ services:
       env_file:
         - .env
       image: clickhouse/clickhouse-server:latest
-      profiles:
-        - stats
       restart: unless-stopped
       ports:
         - '8123:8123'
@@ -87,8 +102,6 @@ services:
 
   otelcol:
       image: otel/opentelemetry-collector-contrib:latest
-      profiles:
-        - stats
       container_name: otel-col
       restart: unless-stopped
       command: [ "--config=/etc/otelcol-config.yml", "--config=/etc/otelcol-config-extras.yml" ]
@@ -107,4 +120,3 @@ services:
 volumes:
   ch-data:
   dashboard-data:
-

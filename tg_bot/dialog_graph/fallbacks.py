@@ -12,8 +12,7 @@ def fallback_response(ctx: Context, _: Pipeline) -> Message:
             return Message(text="You should've started the dialog with '/start'")
         else:
             return Message(
-                text=f"That was against the rules!\n"
-                f"You should've written 'Ping', not '{ctx.last_request.text}'!"
+                text=f"That was against the rules!\n" f"You should've written 'Ping', not '{ctx.last_request.text}'!"
             )
     else:
         raise RuntimeError("Error occurred: last request is None!")

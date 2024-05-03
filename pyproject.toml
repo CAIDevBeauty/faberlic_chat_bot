@@ -13,3 +13,14 @@ pre-commit = "^3.7.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+src_paths = ["models_api", 'tg_bot']
+
+
+[tool.black]
+line-length=120
+
+[tool.flake8]
+max-line-length=120

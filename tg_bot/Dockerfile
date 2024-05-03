@@ -6,5 +6,6 @@ RUN poetry config installer.max-workers 4 && \
     poetry config virtualenvs.create false && \
     poetry install --no-root --no-interaction --no-ansi
 
-COPY . .
-CMD ["python3", "main.py"]
+COPY . /app
+WORKDIR app
+CMD ["python3", "main.py" ]
