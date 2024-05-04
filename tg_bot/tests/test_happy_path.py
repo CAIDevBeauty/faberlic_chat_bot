@@ -1,3 +1,4 @@
+
 import pytest
 from dff.messengers.telegram import TelegramMessage, TelegramUI
 from dff.script.core.message import Button
@@ -18,16 +19,13 @@ from main import get_pipeline
                 ),
             ),
             (
-                TelegramMessage(
-                    text="Девушка, 30 лет, порекомендуй шампунь для восстановления окрашенных волос. Самые дешевые товары."
-                ),
+                TelegramMessage(text="Девушка, 30 лет, порекомендуй шампунь для увлажнения длинных волос"),
                 TelegramMessage(
                     **{
-                        "text": "Я пример поиска",
+                        "text": "Рекомендую вам сухой шампунь из серии Volume & Style для быстрого освежения прически, устранения жира и придания объема. Содержит кератиновый комплекс для укрепления и защиты волос.",
                         "ui": TelegramUI(
                             buttons=[
-                                Button(text="19", payload="buy"),
-                                Button(text="21", payload="buy"),
+                                Button(text="Сухой шампунь для волос Volume & Style", payload="buy"),
                             ],
                             is_inline=True,
                             row_width=1,
@@ -43,11 +41,10 @@ from main import get_pipeline
                 TelegramMessage(text="Женский, для длинных волос, увлажняющий"),
                 TelegramMessage(
                     **{
-                        "text": "Я пример поиска",
+                        "text": "Рекомендую вам сухой шампунь из серии Volume & Style для быстрого освежения прически, устранения жира и придания объема. Содержит кератиновый комплекс для укрепления и защиты волос.",
                         "ui": TelegramUI(
                             buttons=[
-                                Button(text="19", payload="buy"),
-                                Button(text="21", payload="buy"),
+                                Button(text="Сухой шампунь для волос Volume & Style", payload="buy"),
                             ],
                             is_inline=True,
                             row_width=1,
@@ -55,9 +52,17 @@ from main import get_pipeline
                     }
                 ),
             ),
-            (TelegramMessage(text="Как отменить товар?"), TelegramMessage(text="я отвечаю на faq")),
+            (
+                TelegramMessage(text="Как отменить товар?"),
+                TelegramMessage(
+                    text="Заказ можно отменить самостоятельно только в статусе «Готов к сборке». Отменить возможно только неоплаченный заказ."
+                ),
+            ),
         )
     ],
 )
 async def test_happy_path(happy_path):
-    check_happy_path(get_pipeline(use_cli_interface=True, use_context_storage=False), happy_path)
+    check_happy_path(
+        pipeline=get_pipeline(use_cli_interface=True, use_context_storage=False, use_telemetry=False),
+        happy_path=happy_path,
+    )

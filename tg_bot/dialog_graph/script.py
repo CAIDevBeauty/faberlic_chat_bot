@@ -16,6 +16,7 @@ script = {
     "general_flow": {
         "start_node": {
             TRANSITIONS: {
+                ("general_flow", "start_node"): cnd.exact_match(TelegramMessage("/restart")),
                 ("general_flow", "welcome_node"): cnd.exact_match(TelegramMessage("/start")),
             }
         },
@@ -28,6 +29,7 @@ script = {
             },
             RESPONSE: loc_rsp.get_welcome_text,
             TRANSITIONS: {
+                ("general_flow", "start_node"): cnd.exact_match(TelegramMessage("/restart")),
                 ("product_flow", "search_node"): cnd.all(
                     [loc_cnd.has_intent(["покупка товара"]), loc_cnd.is_slots_full()]
                 ),
@@ -46,6 +48,7 @@ script = {
             },
             RESPONSE: Message("Не получается распознать запрос"),
             TRANSITIONS: {
+                ("general_flow", "start_node"): cnd.exact_match(TelegramMessage("/restart")),
                 ("product_flow", "search_node"): cnd.all(
                     [loc_cnd.has_intent(["покупка товара"]), loc_cnd.is_slots_full()]
                 ),
@@ -67,6 +70,7 @@ script = {
             PRE_RESPONSE_PROCESSING: {"1": loc_prc.clear_search(), "2": loc_prc.search_product()},
             RESPONSE: loc_rsp.get_search_result,
             TRANSITIONS: {
+                ("general_flow", "start_node"): cnd.exact_match(TelegramMessage("/restart")),
                 ("product_flow", "search_node"): cnd.all(
                     [loc_cnd.has_intent(["покупка товара"]), loc_cnd.is_slots_full()]
                 ),
@@ -85,6 +89,7 @@ script = {
             },
             RESPONSE: loc_rsp.get_cannot_extract_all_slots_text,
             TRANSITIONS: {
+                ("general_flow", "start_node"): cnd.exact_match(TelegramMessage("/restart")),
                 ("general_flow", "welcome_node"): cnd.exact_match(TelegramMessage(callback_query="cancel")),
                 ("product_flow", "search_node"): cnd.all(
                     [loc_cnd.has_intent(["покупка товара"]), loc_cnd.is_slots_full()]
@@ -106,6 +111,7 @@ script = {
             },
             RESPONSE: TelegramMessage("Товар добавлен в корзину"),
             TRANSITIONS: {
+                ("general_flow", "start_node"): cnd.exact_match(TelegramMessage("/restart")),
                 ("product_flow", "search_node"): cnd.all(
                     [loc_cnd.has_intent(["покупка товара"]), loc_cnd.is_slots_full()]
                 ),
@@ -127,6 +133,7 @@ script = {
             PRE_RESPONSE_PROCESSING: {"1": loc_prc.clear_faq(), "2": loc_prc.search_faq()},
             RESPONSE: loc_rsp.get_faq_result,
             TRANSITIONS: {
+                ("general_flow", "start_node"): cnd.exact_match(TelegramMessage("/restart")),
                 ("product_flow", "search_node"): cnd.all(
                     [loc_cnd.has_intent(["покупка товара"]), loc_cnd.is_slots_full()]
                 ),

@@ -22,23 +22,19 @@ def get_pipeline(use_cli_interface: bool = False, use_context_storage=True, use_
             " For more info see README.md."
         )
     if not use_telemetry:
-        components = [ACTOR]
+        components = ACTOR
     else:
-        components = (
-            [
-                Service(
-                    handler=ACTOR,
-                    before_handler=[
-                        default_extractors.get_timing_before,
-                    ],
-                    after_handler=[
-                        default_extractors.get_timing_after,
-                        default_extractors.get_current_label,
-                        default_extractors.get_last_request,
-                        default_extractors.get_last_response,
-                        get_service_state,
-                    ],
-                )
+        components = Service(
+            handler=ACTOR,
+            before_handler=[
+                default_extractors.get_timing_before,
+            ],
+            after_handler=[
+                default_extractors.get_timing_after,
+                default_extractors.get_current_label,
+                default_extractors.get_last_request,
+                default_extractors.get_last_response,
+                get_service_state,
             ],
         )
 
@@ -49,7 +45,7 @@ def get_pipeline(use_cli_interface: bool = False, use_context_storage=True, use_
             "fallback_label": ("general_flow", "fallback_node"),
             "messenger_interface": messenger_interface,
             "context_storage": get_db_storage_factory() if use_context_storage else {},
-            "components": [ACTOR],
+            "components": [components],
         },
     )
     return pipeline
