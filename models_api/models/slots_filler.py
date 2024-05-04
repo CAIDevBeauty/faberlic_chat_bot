@@ -15,5 +15,8 @@ class SlotsFiiler(BaseOpenAIModel):
                 {"role": "user", "content": ". ".join(contexts)},
             ],
         )
-        slots_detail = Slots.from_response(completion)
-        return slots_detail
+        try:
+            slots_detail = Slots.from_response(completion)
+            return slots_detail
+        except AssertionError:
+            return Slots()

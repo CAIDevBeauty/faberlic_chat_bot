@@ -85,7 +85,7 @@ script = {
             },
             RESPONSE: loc_rsp.get_cannot_extract_all_slots_text,
             TRANSITIONS: {
-                ("general_flow", "welcome_node"): cnd.exact_match(TelegramMessage("/cancel")),
+                ("general_flow", "welcome_node"): cnd.exact_match(TelegramMessage(callback_query="cancel")),
                 ("product_flow", "search_node"): cnd.all(
                     [loc_cnd.has_intent(["покупка товара"]), loc_cnd.is_slots_full()]
                 ),
