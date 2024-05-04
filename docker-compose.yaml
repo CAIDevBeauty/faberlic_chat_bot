@@ -1,0 +1,126 @@
+version: "3.6"
+services:
+  tg_bot:
+    container_name: tg_bot
+    build:
+      context: tg_bot/
+    env_file:
+      - tg_bot/.env
+      - .env
+    depends_on:
+      context:
+          condition: service_healthy
+      backend:
+        condition: service_started
+
+  backend:
+    container_name: backend
+    build:
+      context: models_api
+      dockerfile: Dockerfile
+    expose:
+      - "8000"
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8000/ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    env_file:
+      - models_api/.env
+      - .env
+    ports:
+       - "${BACKEND_EXTERNAL_PORT}:8000"
+
+  context:
+    image: postgres:latest
+    env_file:
+      - .env
+    healthcheck:
+      test: pg_isready  --username=$${POSTGRES_CONTEXT_USERNAME}
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      PGDATA: /data/postgres
+      POSTGRES_USERNAME: ${POSTGRES_CONTEXT_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_CONTEXT_PASSWORD}
+      POSTGRES_HOST: ${POSTGRES_CONTEXT_HOST}
+      POSTGRES_PORT: ${POSTGRES_CONTEXT_PORT}
+      POSTGRES_DB: ${POSTGRES_CONTEXT_DB}
+    volumes:
+      - ./postgres:/data/postgres
+    ports:
+      - "${POSTGRES_CONTEXT_EXTERNAL_PORT}:5432"
+
+  dashboard:
+    env_file:
+      - .env
+    build:
+      context: ./stats/docker
+      dockerfile: dockerfile_stats
+    image: ghcr.io/deeppavlov/superset_df_dashboard:latest
+    depends_on:
+      dashboard-metadata:
+        condition: service_healthy
+      clickhouse:
+        condition: service_started
+    ports:
+      - "${DASHBOARD_EXTERNAL_PORT}:8088"
+
+  dashboard-metadata:
+    env_file:
+      - .env
+    image: postgres:latest
+    restart: unless-stopped
+    expose:
+      - "5433"
+    ports:
+      - "${DASHBOARD_METADATA_EXTERNAL_PORT}:5433"
+    command: -p 5433
+    healthcheck:
+      test: pg_isready -p 5433 --username=$${POSTGRES_USERNAME}
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - ./dashboard-data:/var/lib/postgresql/data
+
+  clickhouse:
+      env_file:
+        - .env
+      image: clickhouse/clickhouse-server:latest
+      restart: unless-stopped
+      ports:
+        - '${CLICKHOUSE_HTTP_EXTERNAL_PORT}:8123'
+        - '${CLICKHOUSE_HTTPS_EXTERNAL_PORT}:8443'
+        - '${CLICKHOUSE_NATIVE_EXTERNAL_PORT}:9000'
+      volumes:
+        - ./ch-data:/var/lib/clickhouse/
+      healthcheck:
+        test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping
+        interval: 5s
+        timeout: 10s
+        retries: 5
+        start_period: 30s
+
+  otelcol:
+      image: otel/opentelemetry-collector-contrib:latest
+      container_name: otel-col
+      restart: unless-stopped
+      command: [ "--config=/etc/otelcol-config.yml", "--config=/etc/otelcol-config-extras.yml" ]
+      depends_on:
+        clickhouse:
+          condition: service_healthy
+      volumes:
+        - ./stats/otel/otelcol-config.yml:/etc/otelcol-config.yml:ro
+        - ./stats/otel/otelcol-config-extras.yml:/etc/otelcol-config-extras.yml:ro
+      ports:
+        - "${OTELCOL_GRPC_EXTERNAL_PORT}:4317"
+        - "${OTELCOL_HTTP_EXTERNAL_PORT}:4318"
+
+
+
+volumes:
+  ch-data:
+  dashboard-data:

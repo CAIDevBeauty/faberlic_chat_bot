@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "tg-bot"
+version = "0.1.0"
+description = ""
+authors = ["starminalush <alica154323@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+dff = {extras = ["stats", 'telegram', 'postgresql'], version = "^0.7.0"}
+loguru = "^0.7.2"
+
+
+[tool.poetry.group.test.dependencies]
+pytest-asyncio = "^0.23.6"
+pytest-env = "^1.1.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest_env]
+PYTHONPATH="."
+BACKEND_URI='http://127.0.0.1:8000'
