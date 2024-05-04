@@ -39,7 +39,15 @@ script = {
         },
         "fallback_node": {
             RESPONSE: Message("Не получается распознать запрос"),
-            TRANSITIONS: {("product_flow", "search_node"): cnd.true()},
+            TRANSITIONS: {
+                ("product_flow", "search_node"): cnd.all(
+                    [loc_cnd.has_intent(["покупка товара"]), loc_cnd.is_slots_full()]
+                ),
+                ("product_flow", "details_node"): cnd.all(
+                    [loc_cnd.has_intent(["покупка товара"]), cnd.negation(loc_cnd.is_slots_full())]
+                ),
+                ("product_flow", "details_node"): cnd.negation(loc_cnd.has_intent(["покупка товара"])),
+            },
         },
     },
     "product_flow": {
@@ -71,13 +79,16 @@ script = {
             },
             RESPONSE: loc_rsp.get_cannot_extract_all_slots_text,
             TRANSITIONS: {
+                ("general_flow", "welcome_node"): cnd.exact_match(TelegramMessage("/cancel")),
                 ("product_flow", "search_node"): cnd.all(
                     [loc_cnd.has_intent(["покупка товара"]), loc_cnd.is_slots_full()]
                 ),
-                ("product_flow", "details_node"): cnd.all(
-                    [loc_cnd.has_intent(["покупка товара"]), cnd.negation(loc_cnd.is_slots_full())]
+                ("product_flow", "details_node"): cnd.any(
+                    [
+                        cnd.all([loc_cnd.has_intent(["покупка товара"]), cnd.negation(loc_cnd.is_slots_full())]),
+                        cnd.negation(loc_cnd.has_intent(["покупка товара"])),
+                    ]
                 ),
-                ("faq_flow", "question_node"): cnd.negation(loc_cnd.has_intent(["покупка товара"])),
             },
         },
         "buy_node": {

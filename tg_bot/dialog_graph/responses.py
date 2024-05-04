@@ -36,11 +36,12 @@ def get_search_result(ctx: Context, _: Pipeline):
         **{
             "text": "\n".join([response["answer"] for response in responses]),
             "ui": TelegramUI(buttons=buttons, is_inline=True, row_width=1),
-        }
+        },
     )
 
 
 def get_faq_result(ctx: Context, _: Pipeline):
     data = ctx.misc[consts.FAQ_RESULT]
-    data = data.replace('\\"', '"')
+    if "<a>" in data:
+        data = data.replace('\\"', '"')
     return TelegramMessage(parse_mode="HTML", text=data)

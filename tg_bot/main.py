@@ -15,18 +15,18 @@ from dff.stats import (
 
 from dialog_graph import script
 
-set_logger_destination(OTLPLogExporter(os.getenv("OTEL_URI"), insecure=True))
-set_tracer_destination(OTLPSpanExporter(os.getenv("OTEL_URI"), insecure=True))
-dff_instrumentor = OtelInstrumentor()
-dff_instrumentor.instrument()
+# set_logger_destination(OTLPLogExporter(os.getenv("OTEL_URI"), insecure=True))
+# set_tracer_destination(OTLPSpanExporter(os.getenv("OTEL_URI"), insecure=True))
+# dff_instrumentor = OtelInstrumentor()
+# dff_instrumentor.instrument()
 
 
-@dff_instrumentor
-async def get_service_state(ctx: Context, _, info: ExtraHandlerRuntimeInfo):
-    data = {
-        "execution_state": info.component.execution_state,
-    }
-    return data
+# @dff_instrumentor
+# async def get_service_state(ctx: Context, _, info: ExtraHandlerRuntimeInfo):
+#     data = {
+#         "execution_state": info.component.execution_state,
+#     }
+#     return data
 
 
 def _get_db_storage_factory() -> DBContextStorage | None:
@@ -63,19 +63,20 @@ def get_pipeline(use_cli_interface: bool = False, use_context_storage=True) -> P
             "messenger_interface": messenger_interface,
             "context_storage": _get_db_storage_factory() if use_context_storage else {},
             "components": [
-                Service(
-                    handler=ACTOR,
-                    before_handler=[
-                        default_extractors.get_timing_before,
-                    ],
-                    after_handler=[
-                        default_extractors.get_timing_after,
-                        default_extractors.get_current_label,
-                        default_extractors.get_last_request,
-                        default_extractors.get_last_response,
-                        get_service_state,
-                    ],
-                )
+                ACTOR
+                # Service(
+                #     handler=ACTOR,
+                #     before_handler=[
+                #         default_extractors.get_timing_before,
+                #     ],
+                #     after_handler=[
+                #         default_extractors.get_timing_after,
+                #         default_extractors.get_current_label,
+                #         default_extractors.get_last_request,
+                #         default_extractors.get_last_response,
+                #         get_service_state,
+                #     ],
+                # )
             ],
         },
     )
@@ -83,5 +84,5 @@ def get_pipeline(use_cli_interface: bool = False, use_context_storage=True) -> P
 
 
 if __name__ == "__main__":
-    pipeline = get_pipeline()
+    pipeline = get_pipeline(use_context_storage=False)
     pipeline.run()

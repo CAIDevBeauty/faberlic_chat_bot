@@ -60,4 +60,4 @@ from main import get_pipeline
     ],
 )
 async def test_happy_path(happy_path):
-    check_happy_path(get_pipeline(use_cli_interface=True, use_context_storate=False), happy_path)
+    check_happy_path(get_pipeline(use_cli_interface=True, use_context_storage=False), happy_path)
