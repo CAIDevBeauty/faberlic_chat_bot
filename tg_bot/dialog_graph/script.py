@@ -107,7 +107,8 @@ script = {
                 "3": loc_prc.clear_slots(),
                 "4": loc_prc.extract_slots(),
             },
-            RESPONSE: TelegramMessage("я отвечаю на faq"),
+            PRE_RESPONSE_PROCESSING: {"1": loc_prc.clear_faq(), "2": loc_prc.search_faq()},
+            RESPONSE: loc_rsp.get_faq_result,
             TRANSITIONS: {
                 ("product_flow", "search_node"): cnd.all(
                     [loc_cnd.has_intent(["покупка товара"]), loc_cnd.is_slots_full()]

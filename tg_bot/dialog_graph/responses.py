@@ -28,10 +28,6 @@ def get_cannot_extract_all_slots_text(ctx: Context, _: Pipeline) -> Message:
 
 
 def get_search_result(ctx: Context, _: Pipeline):
-    """
-    Return ChatGPT response if it is coherent, fall back to
-    predetermined response otherwise.
-    """
     responses = ctx.misc[consts.SEARCH_RESULT]
     buttons = []
     for response in responses:
@@ -42,3 +38,9 @@ def get_search_result(ctx: Context, _: Pipeline):
             "ui": TelegramUI(buttons=buttons, is_inline=True, row_width=1),
         }
     )
+
+
+def get_faq_result(ctx: Context, _: Pipeline):
+    data = ctx.misc[consts.FAQ_RESULT]
+    data = data.replace('\\"', '"')
+    return TelegramMessage(parse_mode="HTML", text=data)

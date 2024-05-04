@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from api.endpoints import health, rag, faq, intents, slots
+from api.endpoints import faq, health, intents, rag, slots
 
 router = APIRouter()
 

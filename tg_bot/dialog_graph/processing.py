@@ -3,7 +3,7 @@ from collections import defaultdict
 from dff.pipeline import Pipeline
 from dff.script import Context
 
-from api import intents, search, slots
+from api import faq, intents, search, slots
 
 from . import consts
 
@@ -20,6 +20,18 @@ def extract_intents():
     return extract_intents_inner
 
 
+def clear_intents():
+    """
+    Clear intents container.
+    """
+
+    def clear_intents_inner(ctx: Context, _: Pipeline) -> Context:
+        ctx.misc[consts.INTENTS] = []
+        return ctx
+
+    return clear_intents_inner
+
+
 def search_product():
     def search_product_inner(ctx: Context, _: Pipeline) -> Context:
         search_params = ctx.misc[consts.SLOTS]
@@ -27,6 +39,14 @@ def search_product():
         return ctx
 
     return search_product_inner
+
+
+def search_faq():
+    def search_faq_inner(ctx: Context, _: Pipeline) -> Context:
+        ctx.misc[consts.FAQ_RESULT] = faq.get_faq_answer(ctx.last_request)
+        return ctx
+
+    return search_faq_inner
 
 
 def extract_slots():
@@ -43,16 +63,16 @@ def extract_slots():
     return extract_slots_inner
 
 
-def clear_intents():
+def clear_faq():
     """
     Clear intents container.
     """
 
-    def clear_intents_inner(ctx: Context, _: Pipeline) -> Context:
-        ctx.misc[consts.INTENTS] = []
+    def clear_faq_inner(ctx: Context, _: Pipeline) -> Context:
+        ctx.misc[consts.FAQ_RESULT] = []
         return ctx
 
-    return clear_intents_inner
+    return clear_faq_inner
 
 
 def clear_search():
