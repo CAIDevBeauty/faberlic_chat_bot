@@ -6,11 +6,14 @@ from models.answer_generator import AnswerGenerator
 from models.intent_classifier import IntentClassifier
 from models.products_retriever import Retriever
 from models.slots_filler import SlotsFiiler
+from models.question_classifier import FAQClassifier
+
 
 
 def create_app():
     new_app = FastAPI()
     new_app.include_router(router)
+    new_app.state.question_classifier = FAQClassifier()
     new_app.state.retriever = Retriever("catalog.xlsx")
     new_app.state.answer_generator = AnswerGenerator()
     new_app.state.intent_classifier = IntentClassifier()
