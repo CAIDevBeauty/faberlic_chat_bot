@@ -14,10 +14,10 @@ from dff.stats import (
 )
 
 from dialog_graph import script
-from pipeline_services.pre_services import get_nlu_info
 
-set_logger_destination(OTLPLogExporter("grpc://otelcol:4317", insecure=True))
-set_tracer_destination(OTLPSpanExporter("grpc://otelcol:4317", insecure=True))
+
+set_logger_destination(OTLPLogExporter(os.getenv('OTEL_URI'), insecure=True))
+set_tracer_destination(OTLPSpanExporter(os.getenv('OTEL_URI'), insecure=True))
 dff_instrumentor = OtelInstrumentor()
 dff_instrumentor.instrument()
 
@@ -45,12 +45,13 @@ def _get_db_storage_factory() -> DBContextStorage | None:
     return db
 
 
-def get_pipeline() -> Pipeline:
+def get_pipeline(use_cli_interface: bool = False, use_context_storage=True) -> Pipeline:
     telegram_token = os.getenv("TG_BOT_TOKEN")
+    if use_cli_interface:
+        messenger_interface = None
 
-    if telegram_token:
+    elif telegram_token:
         messenger_interface = PollingTelegramInterface(token=telegram_token)
-
     else:
         raise RuntimeError(
             "Telegram token (`TG_BOT_TOKEN`) is not set. `TG_BOT_TOKEN` can be set via `.env` file."
@@ -63,9 +64,8 @@ def get_pipeline() -> Pipeline:
             "start_label": ("general_flow", "start_node"),
             "fallback_label": ("general_flow", "fallback_node"),
             "messenger_interface": messenger_interface,
-            "context_storage": _get_db_storage_factory(),
+            "context_storage": _get_db_storage_factory() if use_context_storage else {},
             "components": [
-                get_nlu_info,
                 Service(
                     handler=ACTOR,
                     before_handler=[

@@ -15,13 +15,13 @@ def has_intent(labels: list) -> Callable:
     return has_intent_inner
 
 
-# def is_slots_full() -> Callable:
-#     def is_slots_full_inner(ctx: Context, _: Pipeline) -> bool:
-#         expected_slots = ["sex", "product_type", "action", "hair_type", "is_cheap"]
-#         if ctx.validation:
-#             return False
-#         return all(
-#             [slot in ctx.misc[consts.SLOTS] and ctx.misc[consts.SLOTS].get(slot) is not None for slot in expected_slots]
-#         )
-#
-#     return is_slots_full_inner
+def is_slots_full() -> Callable:
+    def is_slots_full_inner(ctx: Context, _: Pipeline) -> bool:
+        expected_slots = ["sex", "product_type", "action", "hair_type", "is_cheap"]
+        if ctx.validation:
+            return False
+        return all(
+            [slot in ctx.misc[consts.SLOTS] and ctx.misc[consts.SLOTS].get(slot) is not None for slot in expected_slots]
+        )
+
+    return is_slots_full_inner

@@ -1,7 +1,9 @@
+import os
+
 import requests
 from dff.script import Message
 
-INTENT_RECOGNITION_SERVICE = "http://backend:8000/intents/"
+INTENT_RECOGNITION_SERVICE = f"{os.getenv('BACKEND_URI')}/intents/"
 
 
 def get_intents(request: Message) -> str | None:
