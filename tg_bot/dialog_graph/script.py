@@ -1,5 +1,11 @@
 from dff.messengers.telegram import TelegramMessage
-from dff.script import PRE_TRANSITIONS_PROCESSING, RESPONSE, TRANSITIONS, Message
+from dff.script import (
+    PRE_RESPONSE_PROCESSING,
+    PRE_TRANSITIONS_PROCESSING,
+    RESPONSE,
+    TRANSITIONS,
+    Message,
+)
 from dff.script import conditions as cnd
 
 from . import conditions as loc_cnd
@@ -44,6 +50,7 @@ script = {
                 "3": loc_prc.clear_slots(),
                 "4": loc_prc.extract_slots(),
             },
+            PRE_RESPONSE_PROCESSING: {"1": loc_prc.clear_search(), "2": loc_prc.search_product()},
             RESPONSE: loc_rsp.get_search_result,
             TRANSITIONS: {
                 ("product_flow", "search_node"): cnd.all(

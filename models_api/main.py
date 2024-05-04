@@ -2,10 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.api import router
-from models.intent_classifier import IntentClassifier
-from models.slots_filler import SlotsFiiler
 from models.answer_generator import AnswerGenerator
+from models.intent_classifier import IntentClassifier
 from models.products_retriever import Retriever
+from models.slots_filler import SlotsFiiler
 
 
 def create_app():

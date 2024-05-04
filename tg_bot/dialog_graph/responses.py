@@ -32,19 +32,13 @@ def get_search_result(ctx: Context, _: Pipeline):
     Return ChatGPT response if it is coherent, fall back to
     predetermined response otherwise.
     """
-    # if ctx.validation:
-    #     return Message()
-    # responses = ctx.misc[consts.SEARCH_RESULT]
+    responses = ctx.misc[consts.SEARCH_RESULT]
+    buttons = []
+    for response in responses:
+        buttons.append(Button(text=response["name"], payload="buy"))
     return TelegramMessage(
         **{
-            "text": "Я пример поиска",
-            "ui": TelegramUI(
-                buttons=[
-                    Button(text="19", payload="buy"),
-                    Button(text="21", payload="buy"),
-                ],
-                is_inline=True,
-                row_width=1,
-            ),
+            "text": "\n".join([response["answer"] for response in responses]),
+            "ui": TelegramUI(buttons=buttons, is_inline=True, row_width=1),
         }
     )

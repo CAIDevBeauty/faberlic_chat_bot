@@ -55,6 +55,14 @@ def clear_intents():
     return clear_intents_inner
 
 
+def clear_search():
+    def search_product_inner(ctx: Context, _: Pipeline) -> Context:
+        ctx.misc[consts.SEARCH_RESULT] = []
+        return ctx
+
+    return search_product_inner
+
+
 def clear_slots():
     """
     Clear slots container.

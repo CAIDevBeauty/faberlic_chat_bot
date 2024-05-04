@@ -1,8 +1,9 @@
 import pandas as pd
 
-class Retriever():
+
+class Retriever:
     def __init__(self, catalog_path):
-        self._catalog_df = pd.read_excel("catalog.xlsx")
+        self._catalog_df = pd.read_excel("models/catalog.xlsx")
 
     def retrieve_cost(self, products_idx):
         min_costs = [(product_idx, self._catalog_df.loc[product_idx, "Цена"]) for product_idx in products_idx]
@@ -13,18 +14,23 @@ class Retriever():
         gender_tags_df = self._catalog_df.iloc[gender_products_idx]
 
         hair_type_products_idx = gender_tags_df.loc[
-            (gender_tags_df["Тип волос"].str.contains(tags.hair_type, na=True) |
-             (gender_tags_df["Тип волос"].str == 'все типы волос'))].index
+            (
+                gender_tags_df["Тип волос"].str.contains(tags.hair_type, na=True)
+                | (gender_tags_df["Тип волос"].str == "все типы волос")
+            )
+        ].index
         hair_type_tags_df = self._catalog_df.iloc[hair_type_products_idx]
 
         if len(hair_type_tags_df) > 3:
             effect_products_idx = hair_type_tags_df.loc[
-                hair_type_tags_df["Действие"].str.contains(tags.action, na=False)].index
+                hair_type_tags_df["Действие"].str.contains(tags.action, na=False)
+            ].index
             effect_tags_df = self._catalog_df.iloc[effect_products_idx]
 
             if len(effect_tags_df) > 3:
                 product_type_products_idx = effect_tags_df.loc[
-                    effect_tags_df["Тип товара"].str.contains(tags.product_type, na=False)].index
+                    effect_tags_df["Тип товара"].str.contains(tags.product_type, na=False)
+                ].index
                 return product_type_products_idx
 
             else:
