@@ -21,7 +21,7 @@ def get_welcome_text(ctx: Context, _: Pipeline) -> TelegramMessage:
 
 
 def get_cannot_extract_all_slots_text(ctx: Context, _: Pipeline) -> Message:
-    data = ctx.misc[consts.SLOTS]
+    data = ctx.misc.get(consts.SLOTS)
     return TelegramMessage(
         text=f"Не хватает данных для поиска, пожалуйста, опишите еще {', '.join(product_tags.get(key) for key, value in data.items() if  value is None)}"
     )

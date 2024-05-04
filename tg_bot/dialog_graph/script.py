@@ -38,6 +38,12 @@ script = {
             },
         },
         "fallback_node": {
+            PRE_TRANSITIONS_PROCESSING: {
+                "1": loc_prc.clear_intents(),
+                "2": loc_prc.extract_intents(),
+                "3": loc_prc.clear_slots(),
+                "4": loc_prc.extract_slots(),
+            },
             RESPONSE: Message("Не получается распознать запрос"),
             TRANSITIONS: {
                 ("product_flow", "search_node"): cnd.all(

@@ -89,7 +89,13 @@ def clear_slots():
     """
 
     def clear_slots_inner(ctx: Context, _: Pipeline) -> Context:
-        ctx.misc[consts.SLOTS] = {}
+        ctx.misc[consts.SLOTS] = {
+            "hair_type": None,
+            "product_type": None,
+            "is_cheap": None,
+            "action": None,
+            "sex": None,
+        }
         return ctx
 
     return clear_slots_inner

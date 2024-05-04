@@ -8,7 +8,7 @@ class IntentClassifier(BaseOpenAIModel):
             messages=[
                 {
                     "role": "system",
-                    "content": f"I'm going to ask for classify text. Choose one of the classes: [покупка товара, регистрация на сайте, оплата товара, получение товара, отмена покупки, возврат товара]. Predict only class name.",
+                    "content": f"I'm going to ask for classify text. Choose one of the classes: [покупка товара, регистрация на сайте, faq]. Predict only class name.",
                 },
                 {"role": "user", "content": text},
             ],
