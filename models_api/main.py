@@ -4,11 +4,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.api import router
 from models.intent_classifier import IntentClassifier
 from models.slots_filler import SlotsFiiler
+from models.answer_generator import AnswerGenerator
+from models.products_retriever import Retriever
 
 
 def create_app():
     new_app = FastAPI()
     new_app.include_router(router)
+    new_app.state.retriever = Retriever("catalog.xlsx")
+    new_app.state.answer_generator = AnswerGenerator()
     new_app.state.intent_classifier = IntentClassifier()
     new_app.state.slots_filler = SlotsFiiler()
     return new_app
